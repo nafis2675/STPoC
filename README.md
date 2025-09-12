@@ -1,145 +1,246 @@
-# Object Detection Web App
+# Object Detection Comparison PoC
 
-A modern web application for object detection using YOLOv11x model with image upload, camera capture, and clipboard paste functionality.
+A comprehensive web application for object detection and comparison using YOLO11x. This application allows users to compare objects between two images, identify missing or added items, and perform real-time object detection on video streams.
+
+![Object Detection Demo](https://img.shields.io/badge/YOLO-11x-blue) ![FastAPI](https://img.shields.io/badge/FastAPI-Latest-green) ![Python](https://img.shields.io/badge/Python-3.8+-yellow)
 
 ## Features
 
-### 🔄 **Two-Image Workflow** (Matches Your Original Colab Cells)
-- **Step 1**: Process First Image (Cell 5 equivalent)
-- **Step 2**: Process Second Image (Cell 6 equivalent) 
-- **Step 3**: Automatic Comparison (Cell 7 equivalent)
-- **Step 4**: Parameter Adjustment (Cell 8 equivalent)
-- **Step 5**: Results Saving (Cell 9 equivalent)
+### 🔍 Core Detection Capabilities
+- **Dual Image Comparison**: Upload two images and identify differences in detected objects
+- **Real-time Video Processing**: Live object detection via webcam with WebSocket streaming
+- **Advanced YOLO11x Integration**: State-of-the-art object detection with 80+ object classes
+- **Confidence Threshold Control**: Adjustable detection sensitivity (0.1 - 1.0)
+- **Batch Processing**: Support for multiple detection parameters
 
-### 📤 **Multiple Input Methods**
-- **File Upload**: Drag & drop or click to upload images
-- **Camera Capture**: Take photos directly from webcam
-- **Clipboard Paste**: Paste images with Ctrl+V or paste button
+### 📊 Analysis & Visualization
+- **Object Counting**: Automatic counting of detected objects by class
+- **Difference Analysis**: Identify missing, added, and changed objects between images
+- **Visual Annotations**: Bounding boxes with confidence scores
+- **Comparison Reports**: Detailed analysis with statistics and summaries
+- **Export Functionality**: Save results as reports and annotated images
 
-### 🎯 **Advanced Object Detection**
-- **YOLOv11x Model**: Maximum detection accuracy (same as your Colab)
-- **Configurable Parameters**: Real-time adjustment of confidence, IoU, and max detections
-- **Parameter Re-analysis**: Adjust settings and re-process both images (Cell 8 feature)
+### 🌐 Web Interface
+- **Modern UI**: Clean, responsive web interface
+- **Multiple Input Methods**: File upload, drag-and-drop, camera capture, clipboard paste
+- **Real-time Preview**: Live camera feed with object detection overlay
+- **Network Access**: LAN sharing capabilities for remote access
+- **Progress Indicators**: Real-time processing status and feedback
 
-### 📊 **Comprehensive Comparison**
-- **Side-by-side Analysis**: Visual comparison of both annotated images
-- **Detailed Change Report**: Object count changes, new/removed classes
-- **Statistical Summary**: Total objects, unique classes, and differences
+## Quick Start
 
-### 💾 **Results Export** 
-- **Report Download**: Text file with complete analysis (Cell 9 feature)
-- **Image Download**: Save annotated images with detection boxes
-- **Workflow Reset**: Start fresh analysis with new image pairs
-
-## Prerequisites
-
+### Prerequisites
 - Python 3.8 or higher
-- Webcam (for camera capture functionality)
-- Modern web browser with camera permissions
+- Webcam (optional, for real-time detection)
+- 4GB+ RAM recommended
+- Internet connection (for initial YOLO model download)
 
-## Installation
+### Installation & Launch
 
-1. Install required dependencies:
+#### Windows
 ```bash
-pip install -r requirements.txt
+# Clone or download the project
+cd OD_PoC
+
+# Run the automated setup
+run.bat
 ```
 
-2. Download the YOLO model (will be automatically downloaded on first run):
-   - The app uses `yolo11x.pt` which will be downloaded automatically by ultralytics
-
-## Usage
-
-1. Start the web application:
+#### Linux/macOS
 ```bash
+# Clone or download the project
+cd OD_PoC
+
+# Make the script executable
+chmod +x run.sh
+
+# Run the automated setup
+./run.sh
+```
+
+#### Manual Installation
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the application
 python app.py
 ```
 
-2. Open your browser and go to: `http://localhost:8000`
+### Access the Application
+- **Local Access**: http://localhost:3000
+- **Network Access**: Visit http://localhost:3000/network-access for LAN sharing instructions
 
-3. Choose your input method:
-   - **Upload**: Click "Upload Image" to select a file
-   - **Camera**: Click "Take Photo" to capture from your webcam
-   - **Paste**: Copy an image and click "Paste Image" or use Ctrl+V
+## Usage Guide
 
-4. Adjust detection parameters if needed:
-   - **Confidence Threshold**: Lower values detect more objects (may include false positives)
-   - **IoU Threshold**: Controls overlap filtering between detections
-   - **Max Detections**: Maximum number of objects to detect
+### 1. Image Comparison Workflow
 
-5. View results:
-   - Original and annotated images side by side
-   - Detection statistics and detailed object list
-   - Save results for comparison
+#### Step 1: Upload First Image
+- Click "Choose File" or drag-and-drop your first image
+- Supported formats: JPG, PNG, JPEG
+- Or use camera capture / paste from clipboard
 
-6. Compare images:
-   - Save your first detection result
-   - Process a second image
-   - Click "Compare with Previous" to see differences
+#### Step 2: Upload Second Image
+- Upload the second image using any supported method
+- The system will automatically enable comparison once both images are processed
 
-## API Endpoints
+#### Step 3: Review Results
+- View detected objects with bounding boxes
+- Check the comparison table showing differences
+- Analyze missing/added objects statistics
 
-- `GET /`: Main web interface
-- `POST /detect`: Upload and detect objects in image file
-- `POST /detect-base64`: Detect objects in base64 encoded image
-- `POST /compare`: Compare two detection results
-- `GET /health`: Health check endpoint
+#### Step 4: Adjust Parameters (Optional)
+- Fine-tune confidence threshold (default: 0.15)
+- Modify IoU threshold for overlapping detections
+- Adjust maximum detections limit
 
-## Configuration
+#### Step 5: Export Results
+- Download annotated images
+- Export detailed reports
+- Save comparison data
 
-You can modify detection parameters in the web interface:
+### 2. Real-time Video Detection
+1. Click "Start Live Detection"
+2. Allow camera access when prompted
+3. Adjust detection parameters in real-time
+4. View live object detection overlay
+5. Monitor detection statistics
 
-- **Confidence Threshold**: 0.05 - 0.95 (default: 0.15)
-- **IoU Threshold**: 0.1 - 0.9 (default: 0.45)  
-- **Max Detections**: 10 - 1000 (default: 500)
+### 3. Network Sharing
+1. Visit `/network-access` endpoint
+2. Share the provided IP addresses with other devices on your network
+3. Access the application from any device on the same network
 
 ## Technical Details
 
-- **Backend**: FastAPI with Python
-- **Frontend**: Vanilla JavaScript with modern CSS
-- **AI Model**: YOLOv11x (ultralytics)
-- **Image Processing**: OpenCV and Pillow
-- **UI Framework**: Custom responsive design
+### Object Detection Classes
+The YOLO11x model detects 80+ object classes including:
+- **People & Animals**: person, cat, dog, horse, bird, etc.
+- **Vehicles**: car, truck, bus, motorcycle, bicycle, etc.
+- **Household Items**: chair, table, bed, couch, tv, etc.
+- **Food & Drinks**: apple, banana, cup, bottle, etc.
+- **Electronics**: laptop, phone, keyboard, mouse, etc.
+- **Sports Equipment**: ball, racket, skateboard, etc.
 
-## Browser Compatibility
+### API Endpoints
 
-- Chrome 80+ (recommended)
-- Firefox 75+
-- Safari 13+
-- Edge 80+
+#### Main Endpoints
+- `GET /` - Main application interface
+- `POST /detect/{image_number}` - Process uploaded images (1 or 2)
+- `POST /detect-base64/{image_number}` - Process base64 encoded images
+- `POST /compare` - Compare two processed images
+- `POST /adjust-parameters` - Re-analyze with new parameters
+- `GET /status` - Get current workflow status
 
-## Troubleshooting
+#### Utility Endpoints
+- `GET /health` - Health check and model status
+- `GET /network-access` - Network sharing guide
+- `POST /reset-workflow` - Clear current session
+- `POST /save-results` - Export results
 
-### Camera Issues
-- Ensure camera permissions are granted
-- Check if camera is being used by another application
-- Try refreshing the page and granting permissions again
+#### WebSocket
+- `WS /ws/video/{client_id}` - Real-time video processing
 
-### Model Loading Issues
-- Ensure stable internet connection for first-time model download
-- Check available disk space (model is ~80MB)
-- Verify Python and dependency versions
+### Configuration Options
 
-### Performance
-- Large images may take longer to process
-- Consider reducing max detections for faster processing
-- Ensure sufficient RAM (recommended: 4GB+)
+#### Detection Parameters
+```python
+# Adjustable parameters
+conf_threshold: float = 0.15    # Confidence threshold (0.1 - 1.0)
+iou_threshold: float = 0.45     # IoU threshold for NMS
+max_detection: int = 500        # Maximum detections per image
+```
+
+#### Model Settings
+- **Model**: YOLO11x (yolo11x.pt)
+- **Input Size**: 640px (adjustable)
+- **Processing**: Optimized for both accuracy and speed
+- **Classes**: 80 COCO dataset classes
 
 ## File Structure
 
 ```
 OD_PoC/
-├── app.py              # Main FastAPI application
-├── requirements.txt    # Python dependencies
-├── templates/
-│   └── index.html     # Web interface template
-├── static/
-│   ├── css/
-│   │   └── style.css  # Application styles
-│   └── js/
-│       └── app.js     # Frontend JavaScript
-└── README.md          # This file
+├── app.py                  # Main FastAPI application
+├── requirements.txt        # Python dependencies
+├── yolo11x.pt             # YOLO11x model file
+├── run.bat                # Windows startup script
+├── run.sh                 # Linux/macOS startup script
+├── instruction.md         # Development specifications
+├── quick_test.md         # Testing guide
+├── certs/                # SSL certificates (if needed)
+├── static/               # Static web assets
+│   ├── css/style.css    # Application styles
+│   └── js/app.js        # Frontend JavaScript
+└── templates/           # HTML templates
+    ├── index.html       # Main application interface
+    └── network_access.html # Network sharing guide
 ```
+
+## System Requirements
+
+### Minimum Requirements
+- **CPU**: 4+ cores recommended
+- **RAM**: 4GB minimum, 8GB recommended
+- **Storage**: 2GB free space (for model files)
+- **GPU**: Optional (CUDA-compatible for faster processing)
+
+### Recommended Environment
+- **Python**: 3.9+
+- **Platform**: Windows 10+, Ubuntu 20.04+, macOS 11+
+- **Browser**: Modern browser with WebRTC support
+- **Network**: Stable internet for initial model download
+
+## Troubleshooting
+
+### Common Issues
+
+#### Model Loading Error
+```bash
+# Re-download YOLO model
+pip install ultralytics --upgrade
+python -c "from ultralytics import YOLO; YOLO('yolo11x.pt')"
+```
+
+#### Port Already in Use
+- Change port in `app.py` line 747: `port=3000` to another port
+- Or kill existing process using the port
+
+#### Camera Access Denied
+- Check browser permissions for camera access
+- Ensure no other applications are using the camera
+- Refresh the page and allow camera access
+
+#### Memory Issues
+- Reduce `max_detection` parameter
+- Lower image resolution before upload
+- Close other memory-intensive applications
+
+### Performance Optimization
+- Use GPU acceleration if available
+- Reduce image size for faster processing
+- Adjust confidence threshold for better speed/accuracy balance
+- Use smaller YOLO model variant for speed (yolo11n.pt instead of yolo11x.pt)
+
+## Contributing
+
+This is a Proof of Concept project. For improvements or issues:
+1. Test the application thoroughly
+2. Document any bugs or feature requests
+3. Consider performance optimizations
+4. Ensure compatibility across different platforms
 
 ## License
 
-This project is for educational and demonstration purposes.
+This project is for demonstration and educational purposes. Please ensure compliance with YOLO and dependency licenses for commercial use.
+
+## Version History
+
+- **v1.0.0** - Initial release with dual image comparison
+- **v1.1.0** - Added real-time video processing
+- **v1.2.0** - Enhanced network sharing capabilities
+- **Current** - Optimized performance and expanded detection classes
+
+---
+
+For technical support or questions about the implementation, refer to the `instruction.md` file or test the application using `quick_test.md`.
