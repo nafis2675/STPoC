@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Access - Object Detection App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .network-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #28a745;
+        }
+        .url-box {
+            background: #333;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            word-break: break-all;
+        }
+        .qr-code {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        .device-list {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .device {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .status {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Network Access Guide</h1>
+        
+        <div class="status">
+            ✅ Your Object Detection App is running and ready for network access!
+        </div>
+
+        <div class="network-info">
+            <h3>📡 Network Information</h3>
+            <p><strong>Local IP Address:</strong> {{ local_ip }}</p>
+            <p><strong>Port:</strong> {{ port }}</p>
+            <p><strong>Status:</strong> <span style="color: #28a745;">●</span> Online</p>
+        </div>
+
+        <div class="instructions">
+            <h3>📱 Access from Other Devices</h3>
+            <p>To use the Object Detection App from any device on your network:</p>
+            
+            <div class="url-box">
+                {{ url }}
+            </div>
+
+            {% if candidate_urls and candidate_urls|length > 1 %}
+            <div class="device">
+                <h4>Other available URLs on this machine</h4>
+                <ul>
+                    {% for u in candidate_urls %}
+                    {% if u != url %}
+                    <li><code>{{ u }}</code></li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <div class="qr-code">
+                <h4>📲 Scan QR Code for Easy Mobile Access</h4>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ url }}" 
+                     alt="QR Code" style="border: 2px solid #ddd; border-radius: 8px;">
+                <p><small>Scan with your phone's camera or QR code app</small></p>
+            </div>
+        </div>
+
+        <div class="device-list">
+            <div class="device">
+                <h4>📱 From Mobile Phone/Tablet</h4>
+                <ol>
+                    <li>Connect to the same WiFi network</li>
+                    <li>Open browser (Chrome, Safari, Firefox)</li>
+                    <li>Go to: <code>{{ url }}</code></li>
+                    <li>Use camera, upload, or paste images!</li>
+                </ol>
+            </div>
+
+            <div class="device">
+                <h4>💻 From Another Computer</h4>
+                <ol>
+                    <li>Connect to the same network</li>
+                    <li>Open any web browser</li>
+                    <li>Navigate to: <code>{{ url }}</code></li>
+                    <li>Full functionality available!</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>🔧 Troubleshooting</h3>
+            <ul>
+                <li><strong>Can't connect?</strong> Ensure both devices are on the same WiFi</li>
+                <li><strong>Connection blocked?</strong> Check Windows Firewall settings</li>
+                <li><strong>Mobile issues?</strong> Try different browser or clear cache</li>
+                <li><strong>Still problems?</strong> Restart the app with <code>python app.py</code></li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="/" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                🏠 Go to Main App
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh status every 30 seconds
+        setTimeout(() => {
+            location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>

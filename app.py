@@ -20,6 +20,8 @@ from typing import List, Dict, Any, Optional
 import os
 import tempfile
 from pathlib import Path
+import socket
+import ipaddress
 
 # Initialize FastAPI app
 app = FastAPI(title="Object Detection App", description="YOLO-based Object Detection and Comparison")
@@ -34,6 +36,69 @@ image_results = {
     "image1": None,
     "image2": None
 }
+
+def get_local_ip():
+    """Get the local IP address of the machine"""
+    try:
+        # Connect to a remote address to get the local IP
+        # This doesn't actually send data, just determines the route
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0)
+        try:
+            # Use Google's DNS server as the target
+            s.connect(('8.8.8.8', 80))
+            ip = s.getsockname()[0]
+        except Exception:
+            ip = '127.0.0.1'
+        finally:
+            s.close()
+    except Exception:
+        ip = '127.0.0.1'
+    return ip
+
+def is_private_ipv4(ip: str) -> bool:
+    """Return True if the IP is IPv4 and in a private LAN range."""
+    try:
+        addr = ipaddress.ip_address(ip)
+        return addr.version == 4 and addr.is_private
+    except ValueError:
+        return False
+
+def get_all_private_ipv4_addresses() -> List[str]:
+    """Enumerate all private IPv4 addresses for local adapters (best-effort, stdlib only)."""
+    candidates = set()
+
+    # Hostname-based discovery
+    try:
+        hostname = socket.gethostname()
+        host_ips = socket.gethostbyname_ex(hostname)[2]
+        for ip in host_ips:
+            if is_private_ipv4(ip):
+                candidates.add(ip)
+    except Exception:
+        pass
+
+    # getaddrinfo-based discovery
+    try:
+        for res in socket.getaddrinfo(hostname, None, socket.AF_INET):
+            ip = res[4][0]
+            if is_private_ipv4(ip):
+                candidates.add(ip)
+    except Exception:
+        pass
+
+    # Always include the primary detected IP
+    primary = get_local_ip()
+    if is_private_ipv4(primary) or primary:
+        candidates.add(primary)
+
+    # Ensure we have at least one IP
+    if not candidates:
+        candidates.add(primary or '127.0.0.1')
+
+    # Sort with primary first
+    sorted_ips = sorted(candidates, key=lambda ip: (ip != primary, ip))
+    return sorted_ips
 
 class ObjectDetectionService:
     def __init__(self):
@@ -176,8 +241,17 @@ async def home(request: Request):
 
 @app.get("/network-access", response_class=HTMLResponse)
 async def network_access(request: Request):
-    """Serve the network access guide"""
-    return templates.TemplateResponse("network_access.html", {"request": request})
+    """Serve the network access guide with dynamic IP"""
+    local_ip = get_local_ip()
+    port = 3000
+    candidate_urls = [f"http://{ip}:{port}" for ip in get_all_private_ipv4_addresses()]
+    return templates.TemplateResponse("network_access.html", {
+        "request": request,
+        "local_ip": local_ip,
+        "port": port,
+        "url": f"http://{local_ip}:{port}",
+        "candidate_urls": candidate_urls
+    })
 
 @app.post("/detect/{image_number}")
 async def detect_objects_numbered(

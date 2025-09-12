@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection App</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <h1><i class="fas fa-eye"></i> Object Detection App</h1>
+                <p>Upload, capture, or paste images to detect objects using YOLO AI</p>
+                <div class="network-info">
+                    <a href="/network-access" class="network-link">
+                        <i class="fas fa-wifi"></i> Access from Other Devices
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="container">
+            <!-- Workflow Progress -->
+            <div class="workflow-progress">
+                <div class="step" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-title">First Image</div>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Second Image</div>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Compare Results</div>
+                </div>
+            </div>
+
+            <!-- Current Step Info -->
+            <div id="step-info" class="step-info">
+                <h2><i class="fas fa-arrow-right"></i> Step 1: Upload First Image</h2>
+                <p>Start by uploading, capturing, or pasting your first image for object detection.</p>
+            </div>
+
+            <!-- Image Input Section -->
+            <div class="input-section">
+                <div class="input-methods">
+                    <div class="input-method">
+                        <label for="file-input" class="input-button">
+                            <i class="fas fa-upload"></i>
+                            <span id="upload-text">Upload First Image</span>
+                            <input type="file" id="file-input" accept="image/*" style="display: none;">
+                        </label>
+                    </div>
+                    
+                    <div class="input-method">
+                        <button id="camera-btn" class="input-button">
+                            <i class="fas fa-camera"></i>
+                            <span id="camera-text">Take First Photo</span>
+                        </button>
+                    </div>
+                    
+                    <div class="input-method">
+                        <button id="paste-btn" class="input-button">
+                            <i class="fas fa-clipboard"></i>
+                            <span id="paste-text">Paste First Image</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Camera Modal -->
+                <div id="camera-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Camera Capture</h3>
+                            <span class="close">&times;</span>
+                        </div>
+                        <div class="camera-container">
+                            <video id="camera-video" autoplay></video>
+                            <canvas id="camera-canvas" style="display: none;"></canvas>
+                        </div>
+                        <div class="camera-controls">
+                            <button id="capture-btn" class="btn btn-primary">
+                                <i class="fas fa-camera"></i> Capture
+                            </button>
+                            <button id="camera-close-btn" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection Parameters -->
+                <div class="parameters-section">
+                    <h3><i class="fas fa-sliders-h"></i> Detection Parameters</h3>
+                    <div class="parameter-grid">
+                        <div class="parameter">
+                            <label for="conf-threshold">Confidence Threshold:</label>
+                            <input type="range" id="conf-threshold" min="0.05" max="0.95" step="0.05" value="0.15">
+                            <span id="conf-value">0.15</span>
+                        </div>
+                        <div class="parameter">
+                            <label for="iou-threshold">IoU Threshold:</label>
+                            <input type="range" id="iou-threshold" min="0.1" max="0.9" step="0.05" value="0.45">
+                            <span id="iou-value">0.45</span>
+                        </div>
+                        <div class="parameter">
+                            <label for="max-detection">Max Detections:</label>
+                            <input type="number" id="max-detection" min="10" max="1000" step="10" value="500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Individual Results Section -->
+            <div id="individual-results" class="results-section" style="display: none;">
+                <h2><i class="fas fa-chart-bar"></i> <span id="current-image-title">Image 1</span> Detection Results</h2>
+                
+                <!-- Single Image Display -->
+                <div class="single-image-container">
+                    <div class="image-panel">
+                        <h3>Original Image</h3>
+                        <img id="current-original-image" alt="Original Image">
+                    </div>
+                    <div class="image-panel">
+                        <h3>Detected Objects</h3>
+                        <img id="current-annotated-image" alt="Annotated Image">
+                    </div>
+                </div>
+
+                <!-- Detection Report -->
+                <div class="report-section">
+                    <div class="report-summary">
+                        <div class="stat-card">
+                            <div class="stat-value" id="current-total-objects">0</div>
+                            <div class="stat-label">Total Objects</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="current-unique-classes">0</div>
+                            <div class="stat-label">Unique Classes</div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-details">
+                        <div class="class-counts">
+                            <h4><i class="fas fa-list"></i> Object Counts by Class</h4>
+                            <div id="current-class-counts-list"></div>
+                        </div>
+                        
+                        <div class="detections-list">
+                            <h4><i class="fas fa-search"></i> Detailed Detections</h4>
+                            <div id="current-detections-table"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Step Button -->
+                <div class="action-buttons">
+                    <button id="continue-btn" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i> <span id="continue-text">Continue to Image 2</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Both Images Summary -->
+            <div id="both-images-summary" class="results-section" style="display: none;">
+                <h2><i class="fas fa-images"></i> Both Images Processed</h2>
+                
+                <div class="both-images-container">
+                    <div class="image-summary-panel">
+                        <h3>Image 1</h3>
+                        <img id="summary-image1-annotated" alt="Image 1">
+                        <div class="summary-stats">
+                            <span id="summary-image1-objects">0 objects</span>
+                        </div>
+                    </div>
+                    <div class="vs-separator">VS</div>
+                    <div class="image-summary-panel">
+                        <h3>Image 2</h3>
+                        <img id="summary-image2-annotated" alt="Image 2">
+                        <div class="summary-stats">
+                            <span id="summary-image2-objects">0 objects</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="view-comparison-btn" class="btn btn-info">
+                        <i class="fas fa-balance-scale"></i> View Detailed Comparison
+                    </button>
+                </div>
+            </div>
+
+            <!-- Parameter Adjustment Section (Cell 8) -->
+            <div id="parameter-adjustment" class="results-section" style="display: none;">
+                <h2><i class="fas fa-sliders-h"></i> Parameter Adjustment (Optional)</h2>
+                <p>Adjust detection parameters to find even more objects. Lower values detect more objects but may include false positives.</p>
+                
+                <div class="adjustment-parameters">
+                    <div class="parameter-grid">
+                        <div class="parameter">
+                            <label for="new-conf-threshold">New Confidence Threshold:</label>
+                            <input type="range" id="new-conf-threshold" min="0.05" max="0.5" step="0.01" value="0.10">
+                            <span id="new-conf-value">0.10</span>
+                        </div>
+                        <div class="parameter">
+                            <label for="new-iou-threshold">New IoU Threshold:</label>
+                            <input type="range" id="new-iou-threshold" min="0.1" max="0.7" step="0.05" value="0.30">
+                            <span id="new-iou-value">0.30</span>
+                        </div>
+                        <div class="parameter">
+                            <label for="new-max-detection">New Max Detections:</label>
+                            <input type="number" id="new-max-detection" min="100" max="2000" step="100" value="1000">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="adjust-parameters-btn" class="btn btn-warning">
+                        <i class="fas fa-cogs"></i> Re-analyze with New Parameters
+                    </button>
+                    <button id="skip-adjustment-btn" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right"></i> Skip Adjustment
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Saving Section (Cell 9) -->
+            <div id="results-saving" class="results-section" style="display: none;">
+                <h2><i class="fas fa-save"></i> Save Results</h2>
+                <p>Download your detection results and comparison report.</p>
+                
+                <div class="save-options">
+                    <div class="save-preview">
+                        <h4>Report Preview:</h4>
+                        <div id="report-preview" class="report-preview-text"></div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="download-report-btn" class="btn btn-success">
+                        <i class="fas fa-download"></i> Download Report
+                    </button>
+                    <button id="download-images-btn" class="btn btn-info">
+                        <i class="fas fa-images"></i> Download Images
+                    </button>
+                    <button id="start-over-btn" class="btn btn-primary">
+                        <i class="fas fa-refresh"></i> Start Over
+                    </button>
+                </div>
+            </div>
+
+            <!-- Comparison Section -->
+            <div id="comparison-section" class="comparison-section" style="display: none;">
+                <h2><i class="fas fa-balance-scale"></i> Image Comparison</h2>
+                
+                <div class="comparison-images">
+                    <div class="comparison-panel">
+                        <h3>Image 1</h3>
+                        <img id="compare-image1" alt="Image 1">
+                        <div class="comparison-stats">
+                            <span id="compare-objects1">0 objects</span>
+                        </div>
+                    </div>
+                    <div class="comparison-panel">
+                        <h3>Image 2</h3>
+                        <img id="compare-image2" alt="Image 2">
+                        <div class="comparison-stats">
+                            <span id="compare-objects2">0 objects</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="comparison-results">
+                    <div class="comparison-summary">
+                        <div class="comparison-stat">
+                            <div class="stat-value" id="object-change">0</div>
+                            <div class="stat-label">Change in Objects</div>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-details">
+                        <div class="class-changes">
+                            <h4><i class="fas fa-exchange-alt"></i> Class Changes</h4>
+                            <div id="class-changes-table"></div>
+                        </div>
+                        
+                        <div class="change-highlights">
+                            <div class="new-classes">
+                                <h4><i class="fas fa-plus-circle"></i> New Objects</h4>
+                                <div id="new-classes-list"></div>
+                            </div>
+                            <div class="removed-classes">
+                                <h4><i class="fas fa-minus-circle"></i> Removed Objects</h4>
+                                <div id="removed-classes-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Navigation -->
+                <div class="action-buttons">
+                    <button id="adjust-params-from-comparison-btn" class="btn btn-warning">
+                        <i class="fas fa-sliders-h"></i> Adjust Parameters
+                    </button>
+                    <button id="save-from-comparison-btn" class="btn btn-success">
+                        <i class="fas fa-save"></i> Save Results
+                    </button>
+                    <button id="restart-workflow-btn" class="btn btn-primary">
+                        <i class="fas fa-refresh"></i> Start New Comparison
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div id="loading-overlay" class="loading-overlay" style="display: none;">
+                <div class="loading-spinner">
+                    <i class="fas fa-cog fa-spin"></i>
+                    <p>Processing image...</p>
+                </div>
+            </div>
+
+            <!-- Toast Notifications -->
+            <div id="toast-container" class="toast-container"></div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
