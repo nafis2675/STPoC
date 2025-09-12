@@ -99,14 +99,7 @@ python app.py
 - Export detailed reports
 - Save comparison data
 
-### 2. Real-time Video Detection
-1. Click "Start Live Detection"
-2. Allow camera access when prompted
-3. Adjust detection parameters in real-time
-4. View live object detection overlay
-5. Monitor detection statistics
-
-### 3. Network Sharing
+### 2. Network Sharing
 1. Visit `/network-access` endpoint
 2. Share the provided IP addresses with other devices on your network
 3. Access the application from any device on the same network
@@ -237,10 +230,11 @@ This project is for demonstration and educational purposes. Please ensure compli
 ## Version History
 
 - **v1.0.0** - Initial release with dual image comparison
-- **v1.1.0** - Added real-time video processing
+- **v1.1.0** - Added real-time video processing(not included in this version)
 - **v1.2.0** - Enhanced network sharing capabilities
 - **Current** - Optimized performance and expanded detection classes
 
 ---
 
 For technical support or questions about the implementation, refer to the `instruction.md` file or test the application using `quick_test.md`.
+
