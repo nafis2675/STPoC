@@ -1,8 +1,3 @@
-"""
-Object Detection Web App
-Converts the Colab notebook functionality into a web application
-"""
-
 from fastapi import FastAPI, File, UploadFile, HTTPException, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -586,3 +581,4 @@ if __name__ == "__main__":
     import uvicorn
     # Try different ports if 8000 is blocked by corporate network
     uvicorn.run(app, host="0.0.0.0", port=3000)
+
